@@ -32,6 +32,19 @@ function get_eid()
    return ret_val
 end
 
+function get_buttons()
+   local b = btn()
+   local buttons = {
+      left  = b & 0x0001 > 0,
+      right = b & 0x0002 > 0,
+      up    = b & 0x0004 > 0,
+      down  = b & 0x0008 > 0,
+      o     = b & 0x0010 > 0,
+      x     = b & 0x0020 > 0
+   }
+   return buttons
+end
+
 
 function _init()
    mk_player()
@@ -68,7 +81,52 @@ end
 
 -- todo: make a system to update the player based on input (maybe have a global for button state...globals bad, but it's easiest to fit in with this, plust it's just a lil pico 8 game, chill
 
+function move_player_system(b_struct)
+   for eid, val in pairs(components.is_player) do
+      if b_struct.up then
+         components.speed[eid].active = true
+         components.speed[eid].val = 1
+         components.direction[eid].y = -1
+         components.direction[eid].x = 0
+      elseif b_struct.down then
+         components.speed[eid].active = true
+         components.speed[eid].val = 1
+         components.direction[eid].y = 1
+         components.direction[eid].x = 0
+      elseif b_struct.right then
+         components.speed[eid].active = true
+         components.speed[eid].val = 1
+         components.direction[eid].y = 0
+         components.direction[eid].x = 1
+      elseif b_struct.left then
+         components.speed[eid].active = true
+         components.speed[eid].val = 1
+         components.direction[eid].y = 0
+         components.direction[eid].x = -1 
+   print(b)
+      else
+         components.speed[eid].active = false
+      end
+   end 
+end
+
+function move_entities_system()
+   for eid, val in pairs(components.speed) do
+      if val.active and components.position[eid] and components.direction[eid] then
+         components.position[eid].x = components.position[eid].x + components.direction[eid].x * val.val
+         components.position[eid].y = components.position[eid].y + components.direction[eid].y * val.val
+         if components.position[eid].x < 0 then components.position[eid].x = 0 end
+         if components.position[eid].x > 128 then components.position[eid].x = 128 end
+         if components.position[eid].y < 0 then components.position[eid].y = 0 end
+         if components.position[eid].y > 128 then components.position[eid].y = 128 end
+      end
+   end
+end
+
 -- todo: move stuff into separate files, organize better
 function _update()
+   local b = get_buttons()
+   move_player_system(b)
+   move_entities_system()
    anim_spr_update_system()
 end
