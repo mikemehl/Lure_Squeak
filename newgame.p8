@@ -1,7 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 29
 __lua__
-
+#include ecs.lua
 #include basic.lua
 #include main.lua
 __gfx__
