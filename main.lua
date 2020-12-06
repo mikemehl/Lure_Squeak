@@ -18,13 +18,15 @@ end
 
 
 function _draw()
-   cls()
+   cls(5)
    anim_spr_draw_system()
 end
 
 function _update()
    local b = get_buttons()
-   move_player_system(b)
+   death_timer_system()
+   control_player_system(b)
    move_entities_system()
+   update_string_toy_position_system()
    anim_spr_update_system()
 end

@@ -1,26 +1,58 @@
 -- basic components and such
 function new_position(eid)
-   local new_pos = { x = 0, y = 0 }
+   local new_pos = 
+   { 
+      x = 0, 
+      y = 0 
+   }
    return add_component(eid, "position", new_pos) 
 end
 
 function new_anim_sprite(eid)
    -- frames is an array of sprite indexes
-   local anim = { frames = {}, timer = 0, curr_frame = 0, timer_reset_val = 0, flip_x = false, flip_y = false, on_motion = false, loop = true}
+   local anim = 
+   { 
+      frames = {}, 
+      timer = 0, 
+      curr_frame = 0, 
+      timer_reset_val = 0, 
+      flip_x = false, 
+      flip_y = false,
+      on_motion = false, 
+      loop = true
+   }
    return add_component(eid, "anim_sprite", anim)
 end
 
 function new_direction(eid)
-   local new_dir = { x = 0, y = 0}
+   local new_dir = 
+   { 
+      x = 0, 
+      y = 0
+   }
   return add_component(eid, "direction", new_dir)
 end
 
 function new_speed(eid)
    -- how fast, and is it actively moving
-   local new_speed = { val = 0, active = false }
+   local new_speed = 
+   { 
+      val = 0, 
+      active = false 
+   }
    return add_component(eid, "speed", new_speed)
 end
 
+function new_death_timer(eid)
+   local new_dt = 
+   {
+      timer = 0,
+      step = 1
+   }
+   return add_component(eid, "death_timer", new_dt)
+end
+
+-- basic systems for these components
 function anim_spr_draw_system()
    for eid, val in pairs(components.anim_sprite) do
       if components.position[eid] then
@@ -34,6 +66,10 @@ end
 
 function anim_spr_update_system()
    for eid, val in pairs(components.anim_sprite) do
+      if components.is_string[eid] then
+         printh("FOUND IT", "anim")
+         printh(eid, "anim")
+      end
       if val.on_motion then
          local s = components.speed[eid]
          if s and s.active == false then return end
@@ -63,6 +99,16 @@ function move_entities_system()
          if components.position[eid].x > 128 then components.position[eid].x = 128 end
          if components.position[eid].y < 0 then components.position[eid].y = 0 end
          if components.position[eid].y > 128 then components.position[eid].y = 128 end
+      end
+   end
+end
+
+function death_timer_system()
+   for eid, val in pairs(components.death_timer) do
+      if val.timer == 0 then
+         remove_entity(eid)
+      else
+         val.timer = val.timer - val.step
       end
    end
 end

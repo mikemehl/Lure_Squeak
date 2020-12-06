@@ -30,7 +30,7 @@ function mk_player()
 end
 
 -- player specific systems
-function move_player_system(b_struct)
+function control_player_system(b_struct)
    for eid, val in pairs(components.is_player) do
       if b_struct.up then
          components.speed[eid].active = true
@@ -52,7 +52,10 @@ function move_player_system(b_struct)
          components.speed[eid].val = 2
          components.direction[eid].y = 0
          components.direction[eid].x = -1 
-   print(b)
+      elseif b_struct.o then
+         if next(components.is_string) == nil then
+            assert(mk_string_toy())
+         end
       else
          components.speed[eid].active = false
       end
