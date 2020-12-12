@@ -16,10 +16,31 @@ function _init()
    mk_player()
 end
 
+function dbg_print()
+   -- NOTE: # and count() return the length of the SEQUENCE in the table
+   --       so, it won't tell you if your table is actually empty
+   local out = {
+      id = "N/A",
+      size = "N/A",
+      anim_timer = "N/A"
+   }
+   for id, val in pairs(components.is_string) do
+      out.id = id
+      out.size = count(components.is_string)
+   end
+
+   if out.id != "N/A" then
+      out.anim_timer = components.anim_sprite[out.id].timer
+   end
+
+   local out_str = "STRING ID: "..out.id.."\nSIZE: "..out.size.."\nATIMER: "..out.anim_timer
+   print(out_str)
+end
 
 function _draw()
    cls(5)
    anim_spr_draw_system()
+   dbg_print()
 end
 
 function _update()
@@ -30,3 +51,4 @@ function _update()
    update_string_toy_position_system()
    anim_spr_update_system()
 end
+

@@ -21,6 +21,9 @@ end
 function remove_component(eid, name)
   if components[name] then
     components[name][eid] = nil
+    if #components[name] < 1 then
+      components[name] = nil
+    end
     return true
   end
   return false
