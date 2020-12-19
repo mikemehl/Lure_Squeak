@@ -21,9 +21,6 @@ end
 function remove_component(eid, name)
   if components[name] then
     components[name][eid] = nil
-    if #components[name] < 1 then
-      components[name] = nil
-    end
     return true
   end
   return false
@@ -31,19 +28,18 @@ end
 
 function remove_entity(eid)
   for _, c in pairs(components) do
-    if c[eid] then del(c, c[eid]) end
+    if c[eid] then c[eid] = nil end
   end
   del(entities, eid)
 end
 
 curr_eid = 0
 
+-- TODO: Change entities so they store some data besides their id.
+--       Should interfere less with default table behavior of sequences?
+--       Maybe have entities be tables with an id and a component list.
 function get_eid()
    local ret_val = curr_eid
    curr_eid = curr_eid + 1
    return ret_val
 end
-
--- TODO:
--- Add a funciton for deleting an entity (and all of it's components, of course).
-
