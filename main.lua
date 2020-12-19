@@ -22,7 +22,8 @@ function dbg_print()
    local out = {
       id = "N/A",
       size = "N/A",
-      anim_timer = "N/A"
+      anim_timer = "N/A",
+      on_motion = "N/A"
    }
    for id, val in pairs(components.is_string) do
       out.id = id
@@ -30,10 +31,12 @@ function dbg_print()
    end
 
    if out.id != "N/A" then
+      assert(components.anim_sprite[out_id].on_motion)
       out.anim_timer = components.anim_sprite[out.id].timer
+      out.on_motion =  components.anim_sprite[out_id].on_motion
    end
 
-   local out_str = "STRING ID: "..out.id.."\nSIZE: "..out.size.."\nATIMER: "..out.anim_timer
+   local out_str = "STRING ID: "..out.id.."\nSIZE: "..out.size.."\nATIMER: "..out.anim_timer.."\nON_MOTION: "..out.on_motion
    print(out_str)
 end
 

@@ -66,10 +66,6 @@ end
 
 function anim_spr_update_system()
    for eid, val in pairs(components.anim_sprite) do
-      if components.is_string[eid] then
-         printh("FOUND IT", "anim")
-         printh(eid, "anim")
-      end
       if val.on_motion then
          local s = components.speed[eid]
          if s and s.active == false then return end
