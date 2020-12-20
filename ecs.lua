@@ -37,7 +37,7 @@ curr_eid = 4
 
 -- TODO: Change entities so they store some data besides their id.
 --       Should interfere less with default table behavior of sequences?
---       Maybe have entities be tables with an id and a component list.
+--       Maybe have entities be tables with an id and a component list (just true and false values).
 function get_eid()
    local ret_val = curr_eid
    curr_eid = curr_eid + 2
