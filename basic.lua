@@ -68,7 +68,9 @@ function anim_spr_update_system()
    for eid, val in pairs(components.anim_sprite) do
       if val.on_motion then
          local s = components.speed[eid]
-         if s and s.active == false then return end
+         if s and s.active == false then 
+            goto continue 
+         end
       end
       val.timer = val.timer - 1
       if val.timer <= 0 then
@@ -83,6 +85,7 @@ function anim_spr_update_system()
          if d.x < 0 then val.flip_x = true end
          if d.x > 0 then val.flip_x = false end
       end
+      ::continue::
    end
 end
 

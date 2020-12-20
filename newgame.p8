@@ -1,6 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 29
 __lua__
+#include debug.lua
 #include ecs.lua
 #include basic.lua
 #include player.lua
