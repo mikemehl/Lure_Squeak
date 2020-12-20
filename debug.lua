@@ -7,13 +7,12 @@ dbg = {
         add(self.logs, s)
     end,
     print = function(self)
-        -- NOTE: # and count() return the length of the SEQUENCE in the table
-        --       so, it won't tell you if your table is actually empty
         local out_str = ""
         for l in all(self.logs) do
             out_str = out_str..l.."\n"
         end
         print(out_str)
+	printh(out_str, "dbg.log")
         -- remove old logs
         if count(self.logs) > self.max_logs then
             local remove_count = count(self.logs) - self.max_logs 
