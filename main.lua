@@ -14,6 +14,7 @@ end
 
 function _init()
    mk_player()
+   mk_sqk()
 end
 
 
@@ -27,6 +28,7 @@ function _update()
    local b = get_buttons()
    death_timer_system()
    control_player_system(b)
+   squeak_ai_system()
    move_entities_system()
    update_string_toy_position_system()
    anim_spr_update_system()
