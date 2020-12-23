@@ -15,6 +15,7 @@ end
 function _init()
    mk_player()
    mk_sqk()
+   music()
 end
 
 
