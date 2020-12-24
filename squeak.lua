@@ -39,7 +39,21 @@ function mk_sqk()
    return new_squeak_ai(new_eid)
 end
 
+function new_affects_squeak(eid)
+    local a = {
+        val = 0.0 -- must be between -1 and 1
+    }
+    return add_component(eid, "affects_squeak", a)
+end
+
 -- squeak ai system
+-- todo: here's the idea (steps)
+--       1. iterate through everything that affects squeak (component list) in a certain radius
+--       2. find the vectors between then and squeak
+--       3. scale those vectors by how much they affect squeak 
+--       4. average those vectors together. this is squeak's target spot
+--   That's it! negative affects will push squeak away, positive draw her near
+--   more todo: have squeak speed change based on distance of target found in plotting (set speed in polotting)
 function squeak_ai_plotting(eid)
     local ai = components.squeak_ai[eid]
     assert(ai)
@@ -64,7 +78,8 @@ function squeak_ai_moving(eid)
     local s = components.speed[eid]
     assert(p and d and s)
 
-    local distance = sqrt((p.x-ai.target_x) ^ 2 + (p.y-ai.target_y) ^ 2)
+    local targ = {x=ai.target_x, y=ai.target_y}
+    local distance = dist(p, targ)
 
     if distance < 5 then 
         ai.state = "plotting"
@@ -74,11 +89,9 @@ function squeak_ai_moving(eid)
         s.val = 0
         s.active = false
     else
-        d.x = ai.target_x - p.x
-        d.y = ai.target_y - p.y
-        local mag = sqrt(d.x^2 + d.y^2)
-        d.x = d.x/mag
-        d.y = d.y/mag
+        local dir = direction(targ, p)
+        d.x = dir.x
+        d.y = dir.y
         s.val = 1
         s.active = true
     end
