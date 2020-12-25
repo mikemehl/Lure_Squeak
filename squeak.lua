@@ -14,8 +14,8 @@ function mk_sqk()
    add(entities, new_eid)
 
    if new_position(new_eid) then
-      components.position[new_eid].x = 4
-      components.position[new_eid].y = 4
+      components.position[new_eid].x = 64
+      components.position[new_eid].y = 64
    end
 
    if new_anim_sprite(new_eid) then
@@ -47,25 +47,66 @@ function new_affects_squeak(eid)
 end
 
 -- squeak ai system
--- todo: here's the idea (steps)
---       1. iterate through everything that affects squeak (component list) in a certain radius
---       2. find the vectors between then and squeak
---       3. scale those vectors by how much they affect squeak 
---       4. average those vectors together. this is squeak's target spot
---   That's it! negative affects will push squeak away, positive draw her near
---   more todo: have squeak speed change based on distance of target found in plotting (set speed in polotting)
+function squeak_find_target(eid)
+    local target_vec = {x = 0, y = 0}
+    local count = 0
+    local squeak_pos = components.position[eid]
+    local total_squeak_affect = 0
+    for id, val in pairs(components.affects_squeak) do
+        local p = components.position[id]
+        if p then
+            -- construct a vector from squeak to this
+            local v = direction(p, squeak_pos)
+            if v then
+                -- scale by the squeak affect
+                v.x = v.x * val.val
+                v.y = v.y * val.val
+                -- add it to our running counters
+                target_vec.x = target_vec.x + v.x
+                target_vec.y = target_vec.y + v.y
+                count = count + 1
+                total_squeak_affect = total_squeak_affect + val.val
+            end
+        end
+    end
+
+    if count > 0 then
+        -- average them
+        target_vec.x = target_vec.x / count
+        target_vec.y = target_vec.y / count
+        total_squeak_affect = total_squeak_affect / count
+        -- scale by the total squeak affect
+        target_vec.x = target_vec.x  
+        target_vec.y = target_vec.y  
+    else
+        target_vec.x = rnd(127)
+        target_vec.y = rnd(127)
+    end
+
+    target_vec.x = target_vec.x % 128
+    target_vec.y = target_vec.y % 128
+    return target_vec
+end
+
 function squeak_ai_plotting(eid)
     local ai = components.squeak_ai[eid]
     assert(ai)
-
-    if ai.target_x == -1 then
-        ai.target_x = rnd(127)
-        ai.target_y = rnd(127)
-    end
+    local t = squeak_find_target(eid)
+    ai.target_x = (ai.target_x + t.x) 
+    ai.target_y = (ai.target_y + t.y)
 
     ai.state_timer = ai.state_timer - 1
 
     if ai.state_timer == 0 then
+        -- target has been a DIRECTION until now!
+        -- transform to a point to reach by scaling by some amount
+        ai.target_x = ai.target_x * (32 + rnd(64))
+        ai.target_y = ai.target_y * (32 + rnd(64))
+        if ai.target_x < 0 then ai.target_x = 0 end
+        if ai.target_y < 0 then ai.target_y = 0 end
+        if ai.target_x > 124 then ai.target_x = 124 end
+        if ai.target_y > 124 then ai.target_y = 124 end
+        dbg:log("TARGET_VEC: "..ai.target_x..", "..ai.target_y)
         ai.state = "moving"
     end
 
@@ -81,7 +122,7 @@ function squeak_ai_moving(eid)
     local targ = {x=ai.target_x, y=ai.target_y}
     local distance = dist(p, targ)
 
-    if distance < 5 then 
+    if distance < 1 then 
         ai.state = "plotting"
         ai.state_timer = 60
         ai.target_x = -1

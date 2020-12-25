@@ -3,6 +3,10 @@ function dist(a, b)
     return sqrt((a.x - b.x) ^ 2 + (a.y - b.y) ^ 2)
 end
 
+function mag(a)
+    return sqrt(a.x^2 + a.y^2)
+end
+
 -- get a unit vector (direction component) from a to b
 function direction(a, b)
     local dir = {}

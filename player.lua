@@ -26,6 +26,10 @@ function mk_player()
       components.speed[new_eid].active = false
    end
 
+   if new_affects_squeak(new_eid) then
+      components.affects_squeak[new_eid].val = -0.5
+   end
+
    return add_component(new_eid, "is_player", true) 
 end
 
