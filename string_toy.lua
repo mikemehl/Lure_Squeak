@@ -20,6 +20,7 @@ function mk_string_toy()
 
    assert(new_affects_squeak(eid))
    components.affects_squeak[eid].val = 0.45
+   components.affects_squeak[eid].radius = 64
 
    return add_component(eid, "is_string", true)
 end

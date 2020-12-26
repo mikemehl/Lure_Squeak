@@ -40,9 +40,9 @@ function mk_sqk()
 end
 
 function new_affects_squeak(eid)
-    -- TODO: Add a radius of affect
     local a = {
-        val = 0.0 -- must be between -1 and 1
+        val = 0.0, -- must be between -1 and 1
+        radius = 0.0
     }
     return add_component(eid, "affects_squeak", a)
 end
@@ -61,7 +61,6 @@ function squeak_ai_plotting(eid)
         local t = squeak_find_target(eid)
         ai.target_x = t.x 
         ai.target_y = t.y 
-        dbg:log("TARGET_VEC: "..ai.target_x..", "..ai.target_y)
         ai.state = "moving"
     end
 
@@ -86,9 +85,11 @@ function squeak_steering(curr_pos, curr_vel, target)
         assert(p)
         assert(v)
         assert(v.val)
-        local s = {x = v.val*(p.x - curr_pos.x), y = v.val*(p.y - curr_pos.y)}
-        steer.x = steer.x + s.x
-        steer.y = steer.y + s.y
+        if dist(p, curr_pos) < v.radius then
+            local s = {x = v.val*(p.x - curr_pos.x), y = v.val*(p.y - curr_pos.y)}
+            steer.x = steer.x + s.x
+            steer.y = steer.y + s.y
+        end
     end
 
     m = mag(steer)
@@ -104,6 +105,21 @@ function squeak_steering(curr_pos, curr_vel, target)
     return r
 end
 
+function squeak_determine_comfort(pos)
+    local avg = 0
+    local count = 0
+    for eid, v in pairs(components.affects_squeak) do
+        local p = components.position[eid]
+        assert(p)
+        if dist(p, pos) < v.radius then
+            avg = avg + v.val
+            count = count + 1
+        end
+    end
+
+    return avg/count
+end
+
 function squeak_ai_moving(eid)
     local ai = components.squeak_ai[eid]
     local p = components.position[eid]
@@ -116,7 +132,8 @@ function squeak_ai_moving(eid)
 
     if distance < 8 then 
         ai.state = "plotting"
-        ai.state_timer = 60
+        local comf = ceil(squeak_determine_comfort(p)*30)
+        ai.state_timer = 60 + comf 
         ai.target_x = -1
         ai.target_y = -1
         s.val = 0
