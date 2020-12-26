@@ -40,6 +40,7 @@ function mk_sqk()
 end
 
 function new_affects_squeak(eid)
+    -- TODO: Add a radius of affect
     local a = {
         val = 0.0 -- must be between -1 and 1
     }
@@ -48,68 +49,59 @@ end
 
 -- squeak ai system
 function squeak_find_target(eid)
-    local target_vec = {x = 0, y = 0}
-    local count = 0
-    local squeak_pos = components.position[eid]
-    local total_squeak_affect = 0
-    for id, val in pairs(components.affects_squeak) do
-        local p = components.position[id]
-        if p then
-            -- construct a vector from squeak to this
-            local v = direction(p, squeak_pos)
-            if v then
-                -- scale by the squeak affect
-                v.x = v.x * val.val
-                v.y = v.y * val.val
-                -- add it to our running counters
-                target_vec.x = target_vec.x + v.x
-                target_vec.y = target_vec.y + v.y
-                count = count + 1
-                total_squeak_affect = total_squeak_affect + val.val
-            end
-        end
-    end
-
-    if count > 0 then
-        -- average them
-        target_vec.x = target_vec.x / count
-        target_vec.y = target_vec.y / count
-        total_squeak_affect = total_squeak_affect / count
-        -- scale by the total squeak affect
-        target_vec.x = target_vec.x  
-        target_vec.y = target_vec.y  
-    else
-        target_vec.x = rnd(127)
-        target_vec.y = rnd(127)
-    end
-
-    target_vec.x = target_vec.x % 128
-    target_vec.y = target_vec.y % 128
-    return target_vec
+    return {x=rnd(120), y=rnd(120)}
 end
 
 function squeak_ai_plotting(eid)
     local ai = components.squeak_ai[eid]
     assert(ai)
-    local t = squeak_find_target(eid)
-    ai.target_x = (ai.target_x + t.x) 
-    ai.target_y = (ai.target_y + t.y)
-
     ai.state_timer = ai.state_timer - 1
 
     if ai.state_timer == 0 then
-        -- target has been a DIRECTION until now!
-        -- transform to a point to reach by scaling by some amount
-        ai.target_x = ai.target_x * (32 + rnd(64))
-        ai.target_y = ai.target_y * (32 + rnd(64))
-        if ai.target_x < 0 then ai.target_x = 0 end
-        if ai.target_y < 0 then ai.target_y = 0 end
-        if ai.target_x > 124 then ai.target_x = 124 end
-        if ai.target_y > 124 then ai.target_y = 124 end
+        local t = squeak_find_target(eid)
+        ai.target_x = t.x 
+        ai.target_y = t.y 
         dbg:log("TARGET_VEC: "..ai.target_x..", "..ai.target_y)
         ai.state = "moving"
     end
 
+end
+
+function squeak_steering(curr_pos, curr_vel, target)
+    local MAX_STEER = 10 
+    local MAX_TGT = 7
+    local steer = {x=0, y=0}
+    local tgt_vel = {x=0, y=0}
+    tgt_vel.x = target.x - curr_pos.x 
+    tgt_vel.y = target.y - curr_pos.y 
+
+    local m = mag(tgt_vel)
+    if m > MAX_TGT then
+        tgt_vel.x = tgt_vel.x / m * MAX_TGT
+        tgt_vel.y = tgt_vel.y / m * MAX_TGT
+    end
+
+    for id, v in pairs(components.affects_squeak) do 
+        local p = components.position[id]
+        assert(p)
+        assert(v)
+        assert(v.val)
+        local s = {x = v.val*(p.x - curr_pos.x), y = v.val*(p.y - curr_pos.y)}
+        steer.x = steer.x + s.x
+        steer.y = steer.y + s.y
+    end
+
+    m = mag(steer)
+    if m > MAX_STEER then
+        steer.x = steer.x / m * MAX_STEER
+        steer.y = steer.y / m * MAX_STEER
+    end
+
+    local r = {x = steer.x + tgt_vel.x, y = steer.y + tgt_vel.y}
+    m = mag(r)
+    r.x = r.x / m
+    r.y = r.y / m
+    return r
 end
 
 function squeak_ai_moving(eid)
@@ -122,7 +114,7 @@ function squeak_ai_moving(eid)
     local targ = {x=ai.target_x, y=ai.target_y}
     local distance = dist(p, targ)
 
-    if distance < 1 then 
+    if distance < 8 then 
         ai.state = "plotting"
         ai.state_timer = 60
         ai.target_x = -1
@@ -130,7 +122,8 @@ function squeak_ai_moving(eid)
         s.val = 0
         s.active = false
     else
-        local dir = direction(targ, p)
+        local curr_dir = {x=d.x, y=d.y}
+        local dir = squeak_steering(p, curr_dir, {x=ai.target_x, y=ai.target_y})
         d.x = dir.x
         d.y = dir.y
         s.val = 1
