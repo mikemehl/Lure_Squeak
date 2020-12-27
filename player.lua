@@ -1,3 +1,8 @@
+function new_is_player(eid)
+  local t = {cooldown = 30} 
+  return add_component(eid, "is_player", t)
+end
+
 -- make the player entity
 function mk_player()
    local new_eid = get_eid()
@@ -26,7 +31,12 @@ function mk_player()
       components.speed[new_eid].active = false
    end
 
-   return add_component(new_eid, "is_player", true) 
+   if new_affects_squeak(new_eid) then
+      components.affects_squeak[new_eid].val = -0.5
+      components.affects_squeak[new_eid].radius = 32
+   end
+
+   return new_is_player(new_eid) 
 end
 
 -- player specific systems
@@ -52,12 +62,19 @@ function control_player_system(b_struct)
          components.speed[eid].val = 2
          components.direction[eid].y = 0
          components.direction[eid].x = -1 
-      elseif b_struct.o then
+      elseif b_struct.o and val.cooldown == 0 then
          if next(components.is_string) == nil then
             assert(mk_string_toy())
+            val.cooldown = 30
          end
       else
          components.speed[eid].active = false
       end
+
+      if not components.is_string[eid] and val.cooldown > 0 then
+         val.cooldown = val.cooldown - 1
+      end
+
+
    end 
 end

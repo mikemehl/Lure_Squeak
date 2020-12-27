@@ -5,6 +5,7 @@ dbg = {
     logs = {},
     log = function(self, s)
         add(self.logs, s)
+	    printh(s, "dbg.log")
     end,
     print = function(self)
         local out_str = ""
@@ -12,7 +13,6 @@ dbg = {
             out_str = out_str..l.."\n"
         end
         print(out_str)
-	printh(out_str, "dbg.log")
         -- remove old logs
         if count(self.logs) > self.max_logs then
             local remove_count = count(self.logs) - self.max_logs 

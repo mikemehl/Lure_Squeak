@@ -14,8 +14,8 @@ function mk_sqk()
    add(entities, new_eid)
 
    if new_position(new_eid) then
-      components.position[new_eid].x = 4
-      components.position[new_eid].y = 4
+      components.position[new_eid].x = 64
+      components.position[new_eid].y = 64
    end
 
    if new_anim_sprite(new_eid) then
@@ -39,22 +39,85 @@ function mk_sqk()
    return new_squeak_ai(new_eid)
 end
 
+function new_affects_squeak(eid)
+    local a = {
+        val = 0.0, -- must be between -1 and 1
+        radius = 0.0
+    }
+    return add_component(eid, "affects_squeak", a)
+end
+
 -- squeak ai system
+function squeak_find_target(eid)
+    return {x=rnd(120), y=rnd(120)}
+end
+
 function squeak_ai_plotting(eid)
     local ai = components.squeak_ai[eid]
     assert(ai)
-
-    if ai.target_x == -1 then
-        ai.target_x = rnd(127)
-        ai.target_y = rnd(127)
-    end
-
     ai.state_timer = ai.state_timer - 1
 
     if ai.state_timer == 0 then
+        local t = squeak_find_target(eid)
+        ai.target_x = t.x 
+        ai.target_y = t.y 
         ai.state = "moving"
     end
 
+end
+
+function squeak_steering(curr_pos, curr_vel, target)
+    local MAX_STEER = 10 
+    local MAX_TGT = 7
+    local steer = {x=0, y=0}
+    local tgt_vel = {x=0, y=0}
+    tgt_vel.x = target.x - curr_pos.x 
+    tgt_vel.y = target.y - curr_pos.y 
+
+    local m = mag(tgt_vel)
+    if m > MAX_TGT then
+        tgt_vel.x = tgt_vel.x / m * MAX_TGT
+        tgt_vel.y = tgt_vel.y / m * MAX_TGT
+    end
+
+    for id, v in pairs(components.affects_squeak) do 
+        local p = components.position[id]
+        assert(p)
+        assert(v)
+        assert(v.val)
+        if dist(p, curr_pos) < v.radius then
+            local s = {x = v.val*(p.x - curr_pos.x), y = v.val*(p.y - curr_pos.y)}
+            steer.x = steer.x + s.x
+            steer.y = steer.y + s.y
+        end
+    end
+
+    m = mag(steer)
+    if m > MAX_STEER then
+        steer.x = steer.x / m * MAX_STEER
+        steer.y = steer.y / m * MAX_STEER
+    end
+
+    local r = {x = steer.x + tgt_vel.x, y = steer.y + tgt_vel.y}
+    m = mag(r)
+    r.x = r.x / m
+    r.y = r.y / m
+    return r
+end
+
+function squeak_determine_comfort(pos)
+    local avg = 0
+    local count = 0
+    for eid, v in pairs(components.affects_squeak) do
+        local p = components.position[eid]
+        assert(p)
+        if dist(p, pos) < v.radius then
+            avg = avg + v.val
+            count = count + 1
+        end
+    end
+
+    return avg/count
 end
 
 function squeak_ai_moving(eid)
@@ -64,21 +127,22 @@ function squeak_ai_moving(eid)
     local s = components.speed[eid]
     assert(p and d and s)
 
-    local distance = sqrt((p.x-ai.target_x) ^ 2 + (p.y-ai.target_y) ^ 2)
+    local targ = {x=ai.target_x, y=ai.target_y}
+    local distance = dist(p, targ)
 
-    if distance < 5 then 
+    if distance < 8 then 
         ai.state = "plotting"
-        ai.state_timer = 60
+        local comf = ceil(squeak_determine_comfort(p)*30)
+        ai.state_timer = 60 + comf 
         ai.target_x = -1
         ai.target_y = -1
         s.val = 0
         s.active = false
     else
-        d.x = ai.target_x - p.x
-        d.y = ai.target_y - p.y
-        local mag = sqrt(d.x^2 + d.y^2)
-        d.x = d.x/mag
-        d.y = d.y/mag
+        local curr_dir = {x=d.x, y=d.y}
+        local dir = squeak_steering(p, curr_dir, {x=ai.target_x, y=ai.target_y})
+        d.x = dir.x
+        d.y = dir.y
         s.val = 1
         s.active = true
     end

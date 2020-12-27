@@ -18,11 +18,21 @@ function mk_string_toy()
    components.death_timer[eid].timer = 15
    components.death_timer[eid].step = 1
 
+   assert(new_affects_squeak(eid))
+   components.affects_squeak[eid].val = 0.45
+   components.affects_squeak[eid].radius = 64
+
    return add_component(eid, "is_string", true)
 end
 
 function update_string_toy_position_system()
     for sid, val in pairs(components.is_string) do
+        local as = components.affects_squeak[sid]
+        if as.val > 0.0 then
+            as.val = as.val - (0.60/60)
+        elseif as.val < 0.0 then
+            as.val = 0.0
+        end
         for pid, val in pairs(components.is_player) do
             local s = components.position[sid]
             local p = components.position[pid]

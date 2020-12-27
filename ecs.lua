@@ -8,7 +8,8 @@ components =
   is_player = {},
   is_string = {},
   death_timer = {},
-  squeak_ai = {}
+  squeak_ai = {},
+  affects_squeak = {}
 }
 
 function add_component(eid, name, vals)
