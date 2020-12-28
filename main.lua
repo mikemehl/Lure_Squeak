@@ -31,6 +31,7 @@ function _update()
    squeak_ai_system()
    move_entities_system()
    update_string_toy_position_system()
+   update_crutch_position_system()
    anim_spr_update_system()
 end
 

@@ -7,6 +7,7 @@ components =
   speed = {},
   is_player = {},
   is_string = {},
+  is_crutch = {},
   death_timer = {},
   squeak_ai = {},
   affects_squeak = {}
