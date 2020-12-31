@@ -10,7 +10,8 @@ components =
   is_crutch = {},
   death_timer = {},
   squeak_ai = {},
-  affects_squeak = {}
+  affects_squeak = {},
+  is_door = {}
 }
 
 function add_component(eid, name, vals)

@@ -8,6 +8,7 @@ __lua__
 #include player.lua
 #include squeak.lua
 #include player_powers.lua
+#include obstacles.lua
 #include main.lua
 __gfx__
 000000000000000000000000000000000000000000000000000000000000000000000000000500000000000000000000555555550000000fffffffff00000000

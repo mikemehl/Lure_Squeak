@@ -49,7 +49,24 @@ end
 
 -- squeak ai system
 function squeak_find_target(eid)
-    return {x=rnd(120), y=rnd(120)}
+    local sp = components.position[eid]
+    local valid = false
+    local t = {x=rnd(120), y=rnd(120)}
+    while not valid do
+       valid = true
+       for i, v in pairs(components.is_door) do
+           local p = components.position[i]
+           assert(p)
+           if dist(t, p) < 16 then
+              local t = {x=rnd(120), y=rnd(120)}
+              valid = false
+              dbg:log("BOO")
+              break
+           end
+       end
+    end
+
+    return t
 end
 
 function squeak_ai_plotting(eid)
@@ -76,8 +93,8 @@ function squeak_steering(curr_pos, curr_vel, target)
 
     local m = mag(tgt_vel)
     if m > MAX_TGT then
-        tgt_vel.x = tgt_vel.x / m * MAX_TGT
-        tgt_vel.y = tgt_vel.y / m * MAX_TGT
+        tgt_vel.x = (tgt_vel.x / m)* MAX_TGT
+        tgt_vel.y = (tgt_vel.y / m)* MAX_TGT
     end
 
     for id, v in pairs(components.affects_squeak) do 
@@ -94,8 +111,8 @@ function squeak_steering(curr_pos, curr_vel, target)
 
     m = mag(steer)
     if m > MAX_STEER then
-        steer.x = steer.x / m * MAX_STEER
-        steer.y = steer.y / m * MAX_STEER
+        steer.x = (steer.x / m) * MAX_STEER
+        steer.y = (steer.y / m) * MAX_STEER
     end
 
     local r = {x = steer.x + tgt_vel.x, y = steer.y + tgt_vel.y}
@@ -133,7 +150,7 @@ function squeak_ai_moving(eid)
     if distance < 8 then 
         ai.state = "plotting"
         local comf = ceil(squeak_determine_comfort(p)*30)
-        ai.state_timer = 60 + comf 
+        ai.state_timer = 30 + comf 
         ai.target_x = -1
         ai.target_y = -1
         s.val = 0
