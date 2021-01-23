@@ -7,8 +7,13 @@ components =
   speed = {},
   is_player = {},
   is_string = {},
+  is_crutch = {},
   death_timer = {},
-  squeak_ai = {}
+  squeak_ai = {},
+  tootsie_ai = {},
+  affects_squeak = {},
+  is_door = {},
+  is_bed = {}
 }
 
 function add_component(eid, name, vals)

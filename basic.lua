@@ -14,7 +14,7 @@ function new_anim_sprite(eid)
    { 
       frames = {}, 
       timer = 0, 
-      curr_frame = 0, 
+      curr_frame = 1, 
       timer_reset_val = 0, 
       flip_x = false, 
       flip_y = false,
@@ -95,9 +95,9 @@ function move_entities_system()
          components.position[eid].x = components.position[eid].x + components.direction[eid].x * val.val
          components.position[eid].y = components.position[eid].y + components.direction[eid].y * val.val
          if components.position[eid].x < 0 then components.position[eid].x = 0 end
-         if components.position[eid].x > 128 then components.position[eid].x = 128 end
+         if components.position[eid].x > 120 then components.position[eid].x = 120 end
          if components.position[eid].y < 0 then components.position[eid].y = 0 end
-         if components.position[eid].y > 128 then components.position[eid].y = 128 end
+         if components.position[eid].y > 120 then components.position[eid].y = 120 end
       end
    end
 end
