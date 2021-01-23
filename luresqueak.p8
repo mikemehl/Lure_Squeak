@@ -7,6 +7,7 @@ __lua__
 #include basic.lua
 #include player.lua
 #include squeak.lua
+#include tootsie.lua
 #include player_powers.lua
 #include obstacles.lua
 #include main.lua

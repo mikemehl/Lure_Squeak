@@ -77,8 +77,6 @@ end
 function squeak_ai_plotting(eid)
     local ai = components.squeak_ai[eid]
     assert(ai)
-    -- getting freezes occasionally when the state timer is zeroed during squeak_ai_moving
-    -- could be negative here????
     ai.state_timer = ai.state_timer - 1
 
     if ai.state_timer <= 0 then

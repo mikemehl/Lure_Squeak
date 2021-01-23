@@ -18,5 +18,10 @@ function direction(a, b)
        dir.y = dir.y / mag
        return dir
     end
+    dbg:log("!~~ MAG = "..mag)
     return nil
+end
+
+function add_vect(a,b)
+    return {x=a.x+b.x, y=a.y+b.y}
 end

@@ -10,6 +10,7 @@ components =
   is_crutch = {},
   death_timer = {},
   squeak_ai = {},
+  tootsie_ai = {},
   affects_squeak = {},
   is_door = {},
   is_bed = {}
