@@ -15,6 +15,9 @@ end
 function _init()
    mk_player()
    mk_sqk()
+   mk_toots()
+   mk_door()
+   mk_bed()
 end
 
 
@@ -29,8 +32,10 @@ function _update()
    death_timer_system()
    control_player_system(b)
    squeak_ai_system()
+   tootsie_ai_system()
    move_entities_system()
    update_string_toy_position_system()
+   update_crutch_position_system()
    anim_spr_update_system()
 end
 

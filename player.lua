@@ -67,6 +67,11 @@ function control_player_system(b_struct)
             assert(mk_string_toy())
             val.cooldown = 30
          end
+      elseif b_struct.x and val.cooldown == 0 then
+         if next(components.is_crutch) == nil then
+            assert(mk_crutch())
+            val.cooldown = 30
+         end
       else
          components.speed[eid].active = false
       end

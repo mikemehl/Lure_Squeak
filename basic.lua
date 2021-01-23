@@ -14,7 +14,7 @@ function new_anim_sprite(eid)
    { 
       frames = {}, 
       timer = 0, 
-      curr_frame = 0, 
+      curr_frame = 1, 
       timer_reset_val = 0, 
       flip_x = false, 
       flip_y = false,
