@@ -52,6 +52,7 @@ function squeak_find_target(eid)
     local sp = components.position[eid]
     local valid = false
     local t = {x=rnd(120), y=rnd(120)}
+    local ctr = 0
     while not valid do
        valid = true
        for i, v in pairs(components.is_door) do
@@ -60,9 +61,13 @@ function squeak_find_target(eid)
            if dist(t, p) < 16 then
               local t = {x=rnd(120), y=rnd(120)}
               valid = false
-              dbg:log("BOO")
               break
            end
+       end
+       ctr = ctr + 1
+       if ctr >= 5 and valid == false then 
+        t = {x=components.position[eid].x, y=components.position[eid].y}
+        valid = true 
        end
     end
 
@@ -72,13 +77,16 @@ end
 function squeak_ai_plotting(eid)
     local ai = components.squeak_ai[eid]
     assert(ai)
+    -- getting freezes occasionally when the state timer is zeroed during squeak_ai_moving
+    -- could be negative here????
     ai.state_timer = ai.state_timer - 1
 
-    if ai.state_timer == 0 then
+    if ai.state_timer <= 0 then
         local t = squeak_find_target(eid)
         ai.target_x = t.x 
         ai.target_y = t.y 
         ai.state = "moving"
+        ai.state_timer = 30 * 3
     end
 
 end
@@ -133,7 +141,6 @@ function squeak_determine_comfort(pos)
             count = count + 1
         end
     end
-
     return avg/count
 end
 
@@ -147,7 +154,7 @@ function squeak_ai_moving(eid)
     local targ = {x=ai.target_x, y=ai.target_y}
     local distance = dist(p, targ)
 
-    if distance < 8 then 
+    if distance < 8 or ai.state_timer <= 0 then 
         ai.state = "plotting"
         local comf = ceil(squeak_determine_comfort(p)*30)
         ai.state_timer = 30 + comf 
@@ -162,6 +169,7 @@ function squeak_ai_moving(eid)
         d.y = dir.y
         s.val = 1
         s.active = true
+        ai.state_timer = ai.state_timer - 1
     end
 end
 

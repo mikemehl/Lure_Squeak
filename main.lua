@@ -16,6 +16,7 @@ function _init()
    mk_player()
    mk_sqk()
    mk_door()
+   mk_bed()
 end
 
 

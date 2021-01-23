@@ -11,7 +11,8 @@ components =
   death_timer = {},
   squeak_ai = {},
   affects_squeak = {},
-  is_door = {}
+  is_door = {},
+  is_bed = {}
 }
 
 function add_component(eid, name, vals)
