@@ -19,14 +19,15 @@ function _init()
    mk_toots()
    mk_door()
    mk_bed()
-   add(draw_systems, anim_spr_draw_system())
+   local f = anim_spr_draw_system()
+   add(draw_systems, f)
 end
 
 
 function _draw()
    cls(5)
    --anim_spr_draw_system()
-   for s in draw_systems do
+   for s in all(draw_systems) do
       s()
    end
    dbg:print()

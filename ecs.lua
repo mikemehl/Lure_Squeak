@@ -44,6 +44,7 @@ end
 function ecs:get_eid()
    local ret_val = self.curr_eid
    self.curr_eid = self.curr_eid + 2
+   add(self.entities, ret_val)
    return ret_val
 end
 
@@ -59,4 +60,5 @@ function ecs:system(comp_list, f, ...)
     ::_skip::
     end
   end
+  return r
 end

@@ -57,9 +57,10 @@ function anim_spr_draw_system()
    local f = function(eid)
       local pos = ecs.components.position[eid]
       local as = ecs.components.anim_sprite[eid]
-      spr(as.frames[val.curr_frame], pos.x, pos.y, 1, 1, as.flip_x, as.flip_y)
+      spr(as.frames[as.curr_frame], pos.x, pos.y, 1, 1, as.flip_x, as.flip_y)
    end
-   return ecs:system({"anim_sprite", "position"}, f)
+   local r = ecs:system({"anim_sprite", "position"}, f)
+   return r
 end
 
 function anim_spr_update_system()
