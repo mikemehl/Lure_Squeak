@@ -10,7 +10,7 @@ function new_tootsie_ai(eid)
 end
 
 function mk_toots()
-   local new_eid = ecs:get_eid()
+   local new_eid = ecs:new_entity()
    add(entities, new_eid)
 
    if new_position(new_eid) then

@@ -1,5 +1,5 @@
 function mk_string_toy()
-   local eid = ecs:get_eid()
+   local eid = ecs:new_entity()
    add(entities, eid)
 
    assert(new_position(eid))
@@ -50,7 +50,7 @@ function update_string_toy_position_system()
 end
 
 function mk_crutch()
-   local eid = ecs:get_eid()
+   local eid = ecs:new_entity()
    add(entities, eid)
 
    assert(new_position(eid))

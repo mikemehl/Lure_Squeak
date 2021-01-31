@@ -5,7 +5,7 @@ end
 
 -- make the player entity
 function mk_player()
-   local new_eid = ecs:get_eid()
+   local new_eid = ecs:new_entity()
    add(entities, new_eid)
 
    if new_position(new_eid) then

@@ -1,5 +1,5 @@
 function mk_door()
-    local id = ecs:get_eid()
+    local id = ecs:new_entity()
 
     assert(new_position(id))
     ecs.components.position[id].x = 32
@@ -21,7 +21,7 @@ function mk_door()
 end
 
 function mk_bed()
-    local id = ecs:get_eid()
+    local id = ecs:new_entity()
 
     assert(new_position(id))
     ecs.components.position[id].x = 64

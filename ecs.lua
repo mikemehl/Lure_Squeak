@@ -41,7 +41,7 @@ function ecs:remove_entity(eid)
   del(self.entities, eid)
 end
 
-function ecs:get_eid()
+function ecs:new_entity()
    local ret_val = self.curr_eid
    self.curr_eid = self.curr_eid + 2
    add(self.entities, ret_val)
