@@ -1,5 +1,7 @@
-entities = {}
-components = 
+ecs = {}
+ecs.curr_eid = 4
+ecs.entities = {}
+ecs.components = 
 {
   position = {},
   anim_sprite = {},
@@ -16,36 +18,45 @@ components =
   is_bed = {}
 }
 
-function add_component(eid, name, vals)
-  if components[name] then
-    components[name][eid] = vals   
+function ecs:add_component(eid, name, vals)
+  if self.components[name] then
+    self.components[name][eid] = vals   
     return true
   end
   return false
 end
 
-function remove_component(eid, name)
-  if components[name] then
-    components[name][eid] = nil
+function ecs:remove_component(eid, name)
+  if self.components[name] then
+    self.components[name][eid] = nil
     return true
   end
   return false
 end
 
-function remove_entity(eid)
-  for _, c in pairs(components) do
+function ecs:remove_entity(eid)
+  for _, c in pairs(self.components) do
     if c[eid] then c[eid] = nil end
   end
-  del(entities, eid)
+  del(self.entities, eid)
 end
 
-curr_eid = 4
-
--- TODO: Change entities so they store some data besides their id.
---       Should interfere less with default table behavior of sequences?
---       Maybe have entities be tables with an id and a component list (just true and false values).
-function get_eid()
-   local ret_val = curr_eid
-   curr_eid = curr_eid + 2
+function ecs:get_eid()
+   local ret_val = self.curr_eid
+   self.curr_eid = self.curr_eid + 2
    return ret_val
+end
+
+function ecs:system(comp_list, f, ...)
+  local r = function(...)
+    for _,v in pairs(self.entities) do
+      for _,c in pairs(comp_list) do
+        if not self.components[c][v] then
+          goto _skip
+        end
+      end
+      f(v, ...)
+    ::_skip::
+    end
+  end
 end
