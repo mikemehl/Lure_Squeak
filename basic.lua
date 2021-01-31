@@ -5,7 +5,7 @@ function new_position(eid)
       x = 0, 
       y = 0 
    }
-   return add_component(eid, "position", new_pos) 
+   return ecs:add_component(eid, "position", new_pos) 
 end
 
 function new_anim_sprite(eid)
@@ -21,7 +21,7 @@ function new_anim_sprite(eid)
       on_motion = false, 
       loop = true
    }
-   return add_component(eid, "anim_sprite", anim)
+   return ecs:add_component(eid, "anim_sprite", anim)
 end
 
 function new_direction(eid)
@@ -30,7 +30,7 @@ function new_direction(eid)
       x = 0, 
       y = 0
    }
-  return add_component(eid, "direction", new_dir)
+  return ecs:add_component(eid, "direction", new_dir)
 end
 
 function new_speed(eid)
@@ -40,7 +40,7 @@ function new_speed(eid)
       val = 0, 
       active = false 
    }
-   return add_component(eid, "speed", new_speed)
+   return ecs:add_component(eid, "speed", new_speed)
 end
 
 function new_death_timer(eid)
@@ -49,14 +49,14 @@ function new_death_timer(eid)
       timer = 0,
       step = 1
    }
-   return add_component(eid, "death_timer", new_dt)
+   return ecs:add_component(eid, "death_timer", new_dt)
 end
 
 -- basic systems for these components
 function anim_spr_draw_system()
-   for eid, val in pairs(components.anim_sprite) do
-      if components.position[eid] then
-         local pos = components.position[eid]
+   for eid, val in pairs(ecs.components.anim_sprite) do
+      if ecs.components.position[eid] then
+         local pos = ecs.components.position[eid]
          spr(val.frames[val.curr_frame], pos.x, pos.y, 1, 1, val.flip_x, val.flip_y)
       else
          assert(false)
@@ -65,9 +65,9 @@ function anim_spr_draw_system()
 end
 
 function anim_spr_update_system()
-   for eid, val in pairs(components.anim_sprite) do
+   for eid, val in pairs(ecs.components.anim_sprite) do
       if val.on_motion then
-         local s = components.speed[eid]
+         local s = ecs.components.speed[eid]
          if s and s.active == false then 
             goto continue 
          end
@@ -80,7 +80,7 @@ function anim_spr_update_system()
         end
         val.timer = val.timer_reset_val
       end
-      local d = components.direction[eid]
+      local d = ecs.components.direction[eid]
       if d then
          if d.x < 0 then val.flip_x = true end
          if d.x > 0 then val.flip_x = false end
@@ -90,22 +90,22 @@ function anim_spr_update_system()
 end
 
 function move_entities_system()
-   for eid, val in pairs(components.speed) do
-      if val.active and components.position[eid] and components.direction[eid] then
-         components.position[eid].x = components.position[eid].x + components.direction[eid].x * val.val
-         components.position[eid].y = components.position[eid].y + components.direction[eid].y * val.val
-         if components.position[eid].x < 0 then components.position[eid].x = 0 end
-         if components.position[eid].x > 120 then components.position[eid].x = 120 end
-         if components.position[eid].y < 0 then components.position[eid].y = 0 end
-         if components.position[eid].y > 120 then components.position[eid].y = 120 end
+   for eid, val in pairs(ecs.components.speed) do
+      if val.active and ecs.components.position[eid] and ecs.components.direction[eid] then
+         ecs.components.position[eid].x = ecs.components.position[eid].x + ecs.components.direction[eid].x * val.val
+         ecs.components.position[eid].y = ecs.components.position[eid].y + ecs.components.direction[eid].y * val.val
+         if ecs.components.position[eid].x < 0 then ecs.components.position[eid].x = 0 end
+         if ecs.components.position[eid].x > 120 then ecs.components.position[eid].x = 120 end
+         if ecs.components.position[eid].y < 0 then ecs.components.position[eid].y = 0 end
+         if ecs.components.position[eid].y > 120 then ecs.components.position[eid].y = 120 end
       end
    end
 end
 
 function death_timer_system()
-   for eid, val in pairs(components.death_timer) do
+   for eid, val in pairs(ecs.components.death_timer) do
       if val.timer == 0 then
-         remove_entity(eid)
+         ecs:remove_entity(eid)
       else
          val.timer = val.timer - val.step
       end

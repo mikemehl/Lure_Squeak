@@ -6,34 +6,34 @@ function new_squeak_ai(eid)
         target_x = -1,
         target_y = -1
     }
-    return add_component(eid, "squeak_ai", v)
+    return ecs:add_component(eid, "squeak_ai", v)
 end
 
 function mk_sqk()
-   local new_eid = get_eid()
+   local new_eid = ecs:get_eid()
    add(entities, new_eid)
 
    if new_position(new_eid) then
-      components.position[new_eid].x = 64
-      components.position[new_eid].y = 64
+      ecs.components.position[new_eid].x = 64
+      ecs.components.position[new_eid].y = 64
    end
 
    if new_anim_sprite(new_eid) then
-      components.anim_sprite[new_eid].frames = {3, 4}
-      components.anim_sprite[new_eid].timer = 5
-      components.anim_sprite[new_eid].curr_frame = 1
-      components.anim_sprite[new_eid].timer_reset_val = 5
-      components.anim_sprite[new_eid].on_motion = true
+      ecs.components.anim_sprite[new_eid].frames = {3, 4}
+      ecs.components.anim_sprite[new_eid].timer = 5
+      ecs.components.anim_sprite[new_eid].curr_frame = 1
+      ecs.components.anim_sprite[new_eid].timer_reset_val = 5
+      ecs.components.anim_sprite[new_eid].on_motion = true
    end
 
    if new_direction(new_eid) then
-      components.direction[new_eid].x = 1
-      components.direction[new_eid].y = 0
+      ecs.components.direction[new_eid].x = 1
+      ecs.components.direction[new_eid].y = 0
    end
 
    if new_speed(new_eid) then
-      components.speed[new_eid].val = 0
-      components.speed[new_eid].active = false
+      ecs.components.speed[new_eid].val = 0
+      ecs.components.speed[new_eid].active = false
    end
 
    return new_squeak_ai(new_eid)
@@ -44,19 +44,19 @@ function new_affects_squeak(eid)
         val = 0.0, -- must be between -1 and 1
         radius = 0.0
     }
-    return add_component(eid, "affects_squeak", a)
+    return ecs:add_component(eid, "affects_squeak", a)
 end
 
 -- squeak ai system
 function squeak_find_target(eid)
-    local sp = components.position[eid]
+    local sp = ecs.components.position[eid]
     local valid = false
     local t = {x=rnd(120), y=rnd(120)}
     local ctr = 0
     while not valid do
        valid = true
-       for i, v in pairs(components.is_door) do
-           local p = components.position[i]
+       for i, v in pairs(ecs.components.is_door) do
+           local p = ecs.components.position[i]
            assert(p)
            if dist(t, p) < 16 then
               local t = {x=rnd(120), y=rnd(120)}
@@ -66,7 +66,7 @@ function squeak_find_target(eid)
        end
        ctr = ctr + 1
        if ctr >= 5 and valid == false then 
-        t = {x=components.position[eid].x, y=components.position[eid].y}
+        t = {x=ecs.components.position[eid].x, y=ecs.components.position[eid].y}
         valid = true 
        end
     end
@@ -75,7 +75,7 @@ function squeak_find_target(eid)
 end
 
 function squeak_ai_plotting(eid)
-    local ai = components.squeak_ai[eid]
+    local ai = ecs.components.squeak_ai[eid]
     assert(ai)
     ai.state_timer = ai.state_timer - 1
 
@@ -103,8 +103,8 @@ function squeak_steering(curr_pos, curr_vel, target)
         tgt_vel.y = (tgt_vel.y / m)* MAX_TGT
     end
 
-    for id, v in pairs(components.affects_squeak) do 
-        local p = components.position[id]
+    for id, v in pairs(ecs.components.affects_squeak) do 
+        local p = ecs.components.position[id]
         assert(p)
         assert(v)
         assert(v.val)
@@ -131,8 +131,8 @@ end
 function squeak_determine_comfort(pos)
     local avg = 0
     local count = 0
-    for eid, v in pairs(components.affects_squeak) do
-        local p = components.position[eid]
+    for eid, v in pairs(ecs.components.affects_squeak) do
+        local p = ecs.components.position[eid]
         assert(p)
         if dist(p, pos) < v.radius then
             avg = avg + v.val
@@ -143,10 +143,10 @@ function squeak_determine_comfort(pos)
 end
 
 function squeak_ai_moving(eid)
-    local ai = components.squeak_ai[eid]
-    local p = components.position[eid]
-    local d = components.direction[eid]
-    local s = components.speed[eid]
+    local ai = ecs.components.squeak_ai[eid]
+    local p = ecs.components.position[eid]
+    local d = ecs.components.direction[eid]
+    local s = ecs.components.speed[eid]
     assert(p and d and s)
 
     local targ = {x=ai.target_x, y=ai.target_y}
@@ -172,7 +172,7 @@ function squeak_ai_moving(eid)
 end
 
 function squeak_ai_system()
-    for eid, val in pairs(components.squeak_ai) do
+    for eid, val in pairs(ecs.components.squeak_ai) do
         if val.state == "plotting" then
             squeak_ai_plotting(eid)
         elseif val.state == "moving" then
