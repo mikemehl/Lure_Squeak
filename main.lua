@@ -11,6 +11,7 @@ function get_buttons()
    return buttons
 end
 
+draw_systems = {}
 
 function _init()
    mk_player()
@@ -18,12 +19,16 @@ function _init()
    mk_toots()
    mk_door()
    mk_bed()
+   add(draw_systems, anim_spr_draw_system())
 end
 
 
 function _draw()
    cls(5)
-   anim_spr_draw_system()
+   --anim_spr_draw_system()
+   for s in draw_systems do
+      s()
+   end
    dbg:print()
 end
 

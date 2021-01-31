@@ -54,14 +54,12 @@ end
 
 -- basic systems for these components
 function anim_spr_draw_system()
-   for eid, val in pairs(ecs.components.anim_sprite) do
-      if ecs.components.position[eid] then
-         local pos = ecs.components.position[eid]
-         spr(val.frames[val.curr_frame], pos.x, pos.y, 1, 1, val.flip_x, val.flip_y)
-      else
-         assert(false)
-      end
+   local f = function(eid)
+      local pos = ecs.components.position[eid]
+      local as = ecs.components.anim_sprite[eid]
+      spr(as.frames[val.curr_frame], pos.x, pos.y, 1, 1, as.flip_x, as.flip_y)
    end
+   return ecs:system({"anim_sprite", "position"}, f)
 end
 
 function anim_spr_update_system()
