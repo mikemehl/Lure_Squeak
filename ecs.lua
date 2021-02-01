@@ -34,11 +34,18 @@ function ecs:remove_component(eid, name)
   return false
 end
 
-function ecs:remove_entity(eid)
-  for _, c in pairs(self.components) do
-    if c[eid] then c[eid] = nil end
+function ecs:get_component(eid, name)
+  if self.components[name] then
+    return self.components[name][eid] 
   end
-  del(self.entities, eid)
+  return nil 
+end
+
+function ecs:has_component(eid, name)
+  if self.components[name] then 
+    return true
+  end
+  return false
 end
 
 function ecs:new_entity()
@@ -46,6 +53,13 @@ function ecs:new_entity()
    self.curr_eid = self.curr_eid + 2
    add(self.entities, ret_val)
    return ret_val
+end
+
+function ecs:remove_entity(eid)
+  for _, c in pairs(self.components) do
+    if c[eid] then c[eid] = nil end
+  end
+  del(self.entities, eid)
 end
 
 function ecs:system(comp_list, f, ...)

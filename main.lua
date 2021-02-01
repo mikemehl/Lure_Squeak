@@ -12,21 +12,23 @@ function get_buttons()
 end
 
 draw_systems = {}
+update_systems = {}
 
 function _init()
+   -- create initial entities
    mk_player()
    mk_sqk()
    mk_toots()
    mk_door()
    mk_bed()
-   local f = anim_spr_draw_system()
-   add(draw_systems, f)
+
+   -- setup draw systems
+   add(draw_systems, anim_spr_draw_system())
 end
 
 
 function _draw()
    cls(5)
-   --anim_spr_draw_system()
    for s in all(draw_systems) do
       s()
    end
